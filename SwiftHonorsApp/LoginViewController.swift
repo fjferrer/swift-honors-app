@@ -16,7 +16,7 @@ var loggedIn:Bool = false
 
 class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
     
-    let defaults = NSUserDefaults.standardUserDefaults()
+    let defaults = UserDefaults.standard
     
     
      //  This adds the Login button to the View Controller
@@ -31,18 +31,18 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
         super.viewDidLoad()
         
         // If "loggedIn" has a value from a previos run, set it here
-        if defaults.objectForKey("loggedIn") != nil {
-            loggedIn = defaults.objectForKey("loggedIn") as! Bool
+        if defaults.object(forKey: "loggedIn") != nil {
+            loggedIn = defaults.object(forKey: "loggedIn") as! Bool
         }
         
         //  If "loggedIn" true, then go to first page, else do nothing
-        if defaults.objectForKey("loggedIn") != nil && defaults.objectForKey("loggedIn") as! Bool
+        if defaults.object(forKey: "loggedIn") != nil && defaults.object(forKey: "loggedIn") as! Bool
         {
             //Helper.helper.loginDidTapped()  FOR NOW, LOGOUT BUTTON WONT SHOW UP SO WE DONT WANT THIS TO WORK
         }
         
         // Adding these two things
-        navigationController?.navigationBar.translucent = false
+        navigationController?.navigationBar.isTranslucent = false
         self.extendedLayoutIncludesOpaqueBars = true
         // prevent extra padding and wierd navi colors
         
@@ -60,7 +60,7 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
         loginButton.delegate = self
         
         
-        if let token = FBSDKAccessToken.currentAccessToken() {
+        if let token = FBSDKAccessToken.current() {
             fetchProfile()
             print("Token: \(token)")
         }
@@ -69,34 +69,35 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
     
     func fetchProfile() {
         let parameters = ["fields": "email, first_name, last_name, picture.type(large)"]
-        FBSDKGraphRequest(graphPath: "me", parameters: parameters).startWithCompletionHandler({ (connection, user, requestError) -> Void in
+        FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { (connection, user, requestError) -> Void in
             
             if requestError != nil {
                 print(requestError)
                 return
             }
             
-            userEmail = (user["email"] as? String)!
-            let firstName = user["first_name"] as? String
-            let lastName = user["last_name"] as? String
-            
+            let userData = user as! [String : AnyObject]
+            userEmail = userData["email"]! as! String
+            let firstName = userData["first_name"]
+            let lastName = userData["last_name"]
+
             userName = "\(firstName!) \(lastName!)"
             
             var pictureUrl = ""
             
-            if let picture = user["picture"] as? NSDictionary, data = picture["data"] as? NSDictionary, url = data["url"] as? String {
+            if let picture = userData["picture"] as? NSDictionary, let data = picture["data"] as? NSDictionary, let url = data["url"] as? String {
                 pictureUrl = url
             }
             
-            let url = NSURL(string: pictureUrl)
-            NSURLSession.sharedSession().dataTaskWithURL(url!, completionHandler: { (data, response, error) -> Void in
+            let url = URL(string: pictureUrl)
+            URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) -> Void in
                 if error != nil {
                     print(error)
                     return
                 }
                 
                 let image = UIImage(data: data!)
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                DispatchQueue.main.async(execute: { () -> Void in
                     userImage = image!
                 })
                 
@@ -105,14 +106,14 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
         })
     }
     
-    func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
         
         if error == nil {
             
             print("completed login")
             fetchProfile()
             
-            defaults.setObject(true, forKey: "loggedIn")
+            defaults.set(true, forKey: "loggedIn")
             
             Helper.helper.loginDidTapped()
             
@@ -124,11 +125,11 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
 
     }
     
-    func loginButtonDidLogOut(loginButton: FBSDKLoginButton!) {
-        defaults.setObject(false, forKey: "loggedIn")
+    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
+        defaults.set(false, forKey: "loggedIn")
     }
     
-    func loginButtonWillLogin(loginButton: FBSDKLoginButton!) -> Bool {
+    func loginButtonWillLogin(_ loginButton: FBSDKLoginButton!) -> Bool {
         return true
     }
 
@@ -138,7 +139,7 @@ class LoginViewController: UIViewController, FBSDKLoginButtonDelegate {
     }
     
     // Create a custom color function
-    func UIColorFromHex(rgbValue:UInt32, alpha:Double=1.0)->UIColor {
+    func UIColorFromHex(_ rgbValue:UInt32, alpha:Double=1.0)->UIColor {
         let red = CGFloat((rgbValue & 0xFF0000) >> 16)/256.0
         let green = CGFloat((rgbValue & 0xFF00) >> 8)/256.0
         let blue = CGFloat(rgbValue & 0xFF)/256.0

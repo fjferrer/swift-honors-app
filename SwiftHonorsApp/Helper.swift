@@ -26,10 +26,10 @@ class Helper {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
         //  From main storyboard instantiate a navigation controller
-        let tabBarVC = storyboard.instantiateViewControllerWithIdentifier("TabBarVC") as! UITabBarController
+        let tabBarVC = storyboard.instantiateViewController(withIdentifier: "TabBarVC") as! UITabBarController
         
         //  Get the app delegate
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         //  Set navigation controller as root view controller
         appDelegate.window?.rootViewController = tabBarVC

@@ -16,14 +16,14 @@ class ToDoViewController: UIViewController, UITableViewDelegate, UITextFieldDele
     //  These functions are for the addition of new items
     
     
-    @IBAction func addItem(sender: AnyObject) {
+    @IBAction func addItem(_ sender: AnyObject) {
         if item.text != nil {
             
             //  Add item to array
             toDoList.append(item.text!)
             
             //  Add item to user defaults
-            NSUserDefaults.standardUserDefaults().setObject(toDoList, forKey: "toDoList")
+            UserDefaults.standard.set(toDoList, forKey: "toDoList")
             item.text = ""
            
             //  Reload the View
@@ -46,8 +46,8 @@ class ToDoViewController: UIViewController, UITableViewDelegate, UITextFieldDele
         self.item.delegate = self
         
         // If a toDoList was stored from a previous session, this restores that session
-        if NSUserDefaults.standardUserDefaults().objectForKey("toDoList") != nil {
-            toDoList = NSUserDefaults.standardUserDefaults().objectForKey("toDoList") as! [String]
+        if UserDefaults.standard.object(forKey: "toDoList") != nil {
+            toDoList = UserDefaults.standard.object(forKey: "toDoList") as! [String]
         }
     }
 
@@ -59,13 +59,13 @@ class ToDoViewController: UIViewController, UITableViewDelegate, UITextFieldDele
     
     //****  ADD IN EVERY APP FOR KERYBOARD!
     //Close the keyboard when touch outside keyboard
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
     
     //****  ADD IN EVERY APP FOR KERYBOARD!
     //********Add this function to close keyboard when user presses return
-    func textFieldShouldReturn(textField: UITextField!) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField!) -> Bool {
         item.resignFirstResponder()
         return true
     }
@@ -77,27 +77,27 @@ class ToDoViewController: UIViewController, UITableViewDelegate, UITextFieldDele
     
     
     //Returns the amount of rows to be in tableview. Std Tableview function
-    public func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return toDoList.count   //Returns the exact count of how many items are in the array
     }
     
     //Returns the exact row in repeat. Like ng-repeat
-    public func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "Cell")
+    open func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: "Cell")
         cell.textLabel?.text = toDoList[indexPath.row]   //Returns the index of our toDoList array
         return cell
     }
     
     //Swipe left to permanently delete item in table AND array
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) {
         //print("before: \(toDoList.count)")
         //print(toDoList)
-        if editingStyle == .Delete {
-            toDoList.removeAtIndex(indexPath.row)
+        if editingStyle == .delete {
+            toDoList.remove(at: indexPath.row)
             
             //Delete item from array
-            NSUserDefaults.standardUserDefaults().setObject(toDoList, forKey: "toDoList")
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            UserDefaults.standard.set(toDoList, forKey: "toDoList")
+            tableView.deleteRows(at: [indexPath], with: .fade)
             
         }
     }

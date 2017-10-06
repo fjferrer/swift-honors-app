@@ -12,7 +12,7 @@ class TutorialPageViewController: UIPageViewController {
     
     weak var tutorialDelegate: TutorialPageViewControllerDelegate?
     
-    private(set) lazy var orderedViewControllers: [UIViewController] = {
+    fileprivate(set) lazy var orderedViewControllers: [UIViewController] = {
         // The view controllers will be shown in this order
         return [self.newColoredViewController("Green"),
             self.newColoredViewController("Red"),
@@ -39,7 +39,7 @@ class TutorialPageViewController: UIPageViewController {
     func scrollToNextViewController() {
         if let visibleViewController = viewControllers?.first,
             let nextViewController = pageViewController(self,
-                viewControllerAfterViewController: visibleViewController) {
+                viewControllerAfter: visibleViewController) {
                     scrollToViewController(nextViewController)
         }
     }
@@ -52,16 +52,16 @@ class TutorialPageViewController: UIPageViewController {
      */
     func scrollToViewController(index newIndex: Int) {
         if let firstViewController = viewControllers?.first,
-            let currentIndex = orderedViewControllers.indexOf(firstViewController) {
-                let direction: UIPageViewControllerNavigationDirection = newIndex >= currentIndex ? .Forward : .Reverse
+            let currentIndex = orderedViewControllers.index(of: firstViewController) {
+                let direction: UIPageViewControllerNavigationDirection = newIndex >= currentIndex ? .forward : .reverse
                 let nextViewController = orderedViewControllers[newIndex]
                 scrollToViewController(nextViewController, direction: direction)
         }
     }
     
-    private func newColoredViewController(color: String) -> UIViewController {
+    fileprivate func newColoredViewController(_ color: String) -> UIViewController {
         return UIStoryboard(name: "Main", bundle: nil) .
-            instantiateViewControllerWithIdentifier("\(color)ViewController")
+            instantiateViewController(withIdentifier: "\(color)ViewController")
     }
     
     /**
@@ -69,8 +69,8 @@ class TutorialPageViewController: UIPageViewController {
      
      - parameter viewController: the view controller to show.
      */
-    private func scrollToViewController(viewController: UIViewController,
-        direction: UIPageViewControllerNavigationDirection = .Forward) {
+    fileprivate func scrollToViewController(_ viewController: UIViewController,
+        direction: UIPageViewControllerNavigationDirection = .forward) {
         setViewControllers([viewController],
             direction: direction,
             animated: true,
@@ -85,9 +85,9 @@ class TutorialPageViewController: UIPageViewController {
     /**
      Notifies '_tutorialDelegate' that the current page index was updated.
      */
-    private func notifyTutorialDelegateOfNewIndex() {
+    fileprivate func notifyTutorialDelegateOfNewIndex() {
         if let firstViewController = viewControllers?.first,
-            let index = orderedViewControllers.indexOf(firstViewController) {
+            let index = orderedViewControllers.index(of: firstViewController) {
                 tutorialDelegate?.tutorialPageViewController(self,
                     didUpdatePageIndex: index)
         }
@@ -99,9 +99,9 @@ class TutorialPageViewController: UIPageViewController {
 
 extension TutorialPageViewController: UIPageViewControllerDataSource {
     
-    func pageViewController(pageViewController: UIPageViewController,
-        viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-            guard let viewControllerIndex = orderedViewControllers.indexOf(viewController) else {
+    func pageViewController(_ pageViewController: UIPageViewController,
+        viewControllerBefore viewController: UIViewController) -> UIViewController? {
+            guard let viewControllerIndex = orderedViewControllers.index(of: viewController) else {
                 return nil
             }
             
@@ -120,9 +120,9 @@ extension TutorialPageViewController: UIPageViewControllerDataSource {
             return orderedViewControllers[previousIndex]
     }
 
-    func pageViewController(pageViewController: UIPageViewController,
-        viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-            guard let viewControllerIndex = orderedViewControllers.indexOf(viewController) else {
+    func pageViewController(_ pageViewController: UIPageViewController,
+        viewControllerAfter viewController: UIViewController) -> UIViewController? {
+            guard let viewControllerIndex = orderedViewControllers.index(of: viewController) else {
                 return nil
             }
             
@@ -146,7 +146,7 @@ extension TutorialPageViewController: UIPageViewControllerDataSource {
 
 extension TutorialPageViewController: UIPageViewControllerDelegate {
     
-    func pageViewController(pageViewController: UIPageViewController,
+    func pageViewController(_ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,
         previousViewControllers: [UIViewController],
         transitionCompleted completed: Bool) {
@@ -163,7 +163,7 @@ protocol TutorialPageViewControllerDelegate: class {
      - parameter tutorialPageViewController: the TutorialPageViewController instance
      - parameter count: the total number of pages.
      */
-    func tutorialPageViewController(tutorialPageViewController: TutorialPageViewController,
+    func tutorialPageViewController(_ tutorialPageViewController: TutorialPageViewController,
         didUpdatePageCount count: Int)
     
     /**
@@ -172,7 +172,7 @@ protocol TutorialPageViewControllerDelegate: class {
      - parameter tutorialPageViewController: the TutorialPageViewController instance
      - parameter index: the index of the currently visible page.
      */
-    func tutorialPageViewController(tutorialPageViewController: TutorialPageViewController,
+    func tutorialPageViewController(_ tutorialPageViewController: TutorialPageViewController,
         didUpdatePageIndex index: Int)
     
 }

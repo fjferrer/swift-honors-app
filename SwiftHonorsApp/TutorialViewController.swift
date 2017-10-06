@@ -25,13 +25,13 @@ class TutorialViewController: UIViewController {
         //pageControl.addTarget(self, action: "didChangePageControlValue", forControlEvents: .ValueChanged)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let tutorialPageViewController = segue.destinationViewController as? TutorialPageViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let tutorialPageViewController = segue.destination as? TutorialPageViewController {
             self.tutorialPageViewController = tutorialPageViewController
         }
     }
 
-    @IBAction func didTapNextButton(sender: UIButton) {
+    @IBAction func didTapNextButton(_ sender: UIButton) {
         tutorialPageViewController?.scrollToNextViewController()
     }
     
@@ -45,12 +45,12 @@ class TutorialViewController: UIViewController {
 
 extension TutorialViewController: TutorialPageViewControllerDelegate {
     
-    func tutorialPageViewController(tutorialPageViewController: TutorialPageViewController,
+    func tutorialPageViewController(_ tutorialPageViewController: TutorialPageViewController,
         didUpdatePageCount count: Int) {
         //pageControl.numberOfPages = count
     }
     
-    func tutorialPageViewController(tutorialPageViewController: TutorialPageViewController,
+    func tutorialPageViewController(_ tutorialPageViewController: TutorialPageViewController,
         didUpdatePageIndex index: Int) {
         //pageControl.currentPage = index
     }
